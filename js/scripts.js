@@ -12,20 +12,20 @@ let pokemonList = [
     },
 
     {
-        name: 'Squirtle',
-        height: 0.5,
-        type: ['water'],
+        name: 'Lapras',
+        height: 2.5,
+        type: ['ice', 'water'],
     },
 
-    {
-        name: 'Pikachu',
-        height: 0.4,
-        type: ['electric'],
-    },
+];
 
-    {
-        name: 'Cubone',
-        height: 0.4,
-        type: ['ground'],
+for (let i=0; i<pokemonList.length; i++) {
+    document.write (pokemonList[i].name + ' (height: ' + pokemonList[i].height + ') ');
+    if (pokemonList[i].height <= 1.0) {
+    document.write ('<br>');
     }
-]
+    else{
+        document.write ('That\s a big pokemon!');
+        document.write('<br>')
+    }
+}
