@@ -1,25 +1,8 @@
 let pokemonRepository = (function () {
 
-let pokemonList = [
-    {
-        name: 'Bulbasaur',
-        height: 0.7,
-        type: ['grass', 'poison'],
-    },
+let pokemonList = [];
+let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
-    {
-        name: 'Charmander',
-        height: 0.6,
-        type: ['fire'],
-    },
-
-    {
-        name: 'Lapras',
-        height: 2.5,
-        type: ['ice', 'water'],
-    },
-
-];
 
 function add(pokemon){
     if (typeof pokemon === 'object'){
@@ -40,30 +23,60 @@ function addListItem(pokemon){
     listpokemon.appendChild(button);
     pokemonList.appendChild(listpokemon);
     addEventListener(button, pokemon);
+    button.addEventListener("click", function(event) {
+        showDetails(pokemon);
+    });
 }
 
-function addEventListener(button, pokemon){
-    button.addEventListener("click",function(){
-    showDetails(pokemon)
+function loadList() {
+    return fetch(apiUrl).then(function (response) {
+        return response.json();
+    }).then(function (json){
+        json.results.forEach(function (item){
+            let pokemon = {
+                name:item.name,
+                detailsUrl: item.url
+            };
+            add(pokemon);
+            console.log(pokemon);
+        });
+    }).catch(function (e){
+        console.error(e);
     })
-    function showDetails(pokemon){
+}
+
+function loadDetails(item) {
+    let url =item.detailsUrl;
+    return fetch(url).then(function (response){
+        return response.json();
+    }).then(function (details){
+        item.imageUrl = details.sprites.front_default;
+        item.height = details.height
+        item.types = details.types
+    }).catch(function (e) {
+        console.error(e);
+    });
+}
+
+
+function showDetails(pokemon) {
+    pokemonRepository.loadDetails(pokemon).then(function () {
         console.log(pokemon);
-    }
+    });
 }
 
 return{
     add: add,
     getAll: getAll,
     addListItem: addListItem,
+    loadList: loadList,
+    loadDetails: loadDetails,
+    showDetails: showDetails
 }
 })();
 
-pokemonRepository.add({
-    name: 'Flaffy',
-    height: 0.78,
-    type: ['electric'],
-});
-
-pokemonRepository.getAll().forEach (function (pokemon) {
-    pokemonRepository.addListItem(pokemon)
+pokemonRepository.loadList().then(function() {
+    pokemonRepository.getAll().forEach (function (pokemon) {
+        pokemonRepository.addListItem(pokemon)
+    });
 });
